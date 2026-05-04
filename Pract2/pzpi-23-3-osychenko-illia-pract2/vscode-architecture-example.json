@@ -1,0 +1,26 @@
+{
+  "name": "architecture-demo-extension",
+  "displayName": "Architecture Demo Extension",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onLanguage:markdown",
+    "onCommand:architectureDemo.showInfo"
+  ],
+  "main": "./dist/node/extension.js",
+  "browser": "./dist/web/extension.js",
+  "extensionKind": [
+    "workspace",
+    "ui"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "architectureDemo.showInfo",
+        "title": "Show VS Code Architecture Info"
+      }
+    ]
+  }
+}
