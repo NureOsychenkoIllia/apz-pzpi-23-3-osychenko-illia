@@ -1,0 +1,50 @@
+@startuml
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontName "DejaVu Sans"
+
+actor "Користувач" as User
+actor "Водій" as Driver
+actor "Диспетчер" as Dispatcher
+
+rectangle "Мобільний застосунок BusOptima" {
+  rectangle "Сесія" {
+    usecase "Увійти до системи" as UC_Login
+    usecase "Переглянути профіль" as UC_Profile
+    usecase "Вийти з системи" as UC_Logout
+  }
+
+  rectangle "Робота з рейсами" {
+    usecase "Працювати з рейсами" as UC_WorkTrips
+    usecase "Переглянути перелік рейсів" as UC_Trips
+    usecase "Фільтрувати рейси за статусом" as UC_Filter
+    usecase "Переглянути деталі рейсу" as UC_Detail
+    usecase "Оновити статус рейсу" as UC_Status
+    usecase "Переглянути аналітику рейсу" as UC_TripAnalytics
+    usecase "Отримати рекомендовану ціну" as UC_Price
+  }
+
+  rectangle "Аналітика" {
+    usecase "Переглянути загальну аналітику" as UC_Dashboard
+  }
+}
+
+User --> UC_Profile
+Driver --> UC_WorkTrips
+
+Dispatcher --> UC_WorkTrips
+Dispatcher --> UC_Dashboard
+
+UC_WorkTrips ..> UC_Login : <<include>>
+UC_WorkTrips ..> UC_Trips : <<include>>
+UC_Dashboard ..> UC_Login : <<include>>
+UC_Profile ..> UC_Login : <<include>>
+
+UC_Detail ..> UC_Trips : <<extend>>
+UC_Filter ..> UC_Trips : <<extend>>
+UC_Status ..> UC_Detail : <<extend>>
+UC_TripAnalytics ..> UC_Detail : <<extend>>
+UC_Price ..> UC_Detail : <<extend>>
+UC_Logout ..> UC_Profile : <<extend>>
+@enduml

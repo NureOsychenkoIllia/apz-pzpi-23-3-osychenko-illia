@@ -1,0 +1,97 @@
+@startuml
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+
+entity "UserDto" as User {
+  * id : Long
+  --
+  email : String
+  fullName : String
+  roleId : Long
+  isActive : Boolean
+}
+
+entity "RoleDto" as Role {
+  * id : Long
+  --
+  name : String
+  description : String
+}
+
+entity "RouteDto" as Route {
+  * id : Long
+  --
+  originCity : String
+  destinationCity : String
+  distanceKm : Double
+  basePrice : Double
+  estimatedDurationMinutes : Int
+  isActive : Boolean
+}
+
+entity "BusDto" as Bus {
+  * id : Long
+  --
+  registrationNumber : String
+  capacity : Int
+  model : String
+  isActive : Boolean
+}
+
+entity "TripDto" as Trip {
+  * id : Long
+  --
+  routeId : Long
+  busId : Long
+  scheduledDeparture : String
+  actualDeparture : String?
+  actualArrival : String?
+  status : String
+  currentPassengers : Int
+  driverName : String
+}
+
+entity "PassengerEventDto" as Event {
+  * id : Long
+  --
+  tripId : Long
+  eventType : String
+  timestamp : String
+  latitude : Double?
+  longitude : Double?
+  passengerCountAfter : Int
+  isSynced : Boolean
+}
+
+entity "TripAnalyticsDto" as TripAnalytics {
+  * id : Long
+  --
+  tripId : Long
+  totalPassengers : Int
+  maxPassengers : Int
+  avgOccupancyRate : Double
+  revenue : Double
+  profit : Double
+  profitabilityPercent : Double
+}
+
+entity "PriceRecommendationDto" as Price {
+  * recommendedPrice : Double
+  --
+  basePrice : Double
+  occupancyRate : Double
+  demandCoefficient : Double
+  timeCoefficient : Double
+  dayCoefficient : Double
+  category : String
+}
+
+User }o--|| Role
+Trip }o--|| Route
+Trip }o--|| Bus
+Trip ||--o{ Event
+Trip ||--o| TripAnalytics
+Trip ..> Price : результат розрахунку ціни
+@enduml

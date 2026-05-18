@@ -1,0 +1,58 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+
+package "com.apz.busoptima" {
+  package "app" as AppPkg
+
+  package "ui" {
+    package "navigation" as NavigationPkg
+    package "screens.login" as LoginPkg
+    package "screens.trips" as TripsPkg
+    package "screens.tripdetail" as TripDetailPkg
+    package "screens.analytics" as AnalyticsPkg
+    package "screens.profile" as ProfilePkg
+    package "theme" as ThemePkg
+    package "util" as UtilPkg
+  }
+
+  package "data" {
+    package "api" as ApiPkg
+    package "api.dto" as DtoPkg
+    package "local" as LocalPkg
+    package "repository" as RepositoryPkg
+  }
+
+  package "di" as DiPkg
+}
+
+AppPkg ..> NavigationPkg
+AppPkg ..> ThemePkg
+AppPkg ..> LocalPkg
+AppPkg ..> DiPkg
+
+NavigationPkg ..> LoginPkg
+NavigationPkg ..> TripsPkg
+NavigationPkg ..> TripDetailPkg
+NavigationPkg ..> AnalyticsPkg
+NavigationPkg ..> ProfilePkg
+
+LoginPkg ..> RepositoryPkg
+TripsPkg ..> RepositoryPkg
+TripsPkg ..> DtoPkg
+TripsPkg ..> UtilPkg
+TripDetailPkg ..> RepositoryPkg
+TripDetailPkg ..> DtoPkg
+TripDetailPkg ..> UtilPkg
+AnalyticsPkg ..> RepositoryPkg
+AnalyticsPkg ..> DtoPkg
+ProfilePkg ..> RepositoryPkg
+
+RepositoryPkg ..> ApiPkg
+RepositoryPkg ..> DtoPkg
+RepositoryPkg ..> LocalPkg
+DiPkg ..> ApiPkg
+DiPkg ..> LocalPkg
+ApiPkg ..> DtoPkg
+@enduml

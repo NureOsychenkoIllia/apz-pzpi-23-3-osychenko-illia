@@ -1,0 +1,38 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName "DejaVu Sans"
+
+actor "Користувач\nмобільного застосунку" as User
+
+node "Android-пристрій" {
+  component "BusOptimaApp\n(Hilt entry point)" as App
+  component "MainActivity\nJetpack Compose host" as Activity
+  component "Navigation\nAppNavigation" as Nav
+  component "UI Screens\nLogin, Trips, TripDetail,\nAnalytics, Profile" as UI
+  component "ViewModels\nStateFlow + Coroutines" as VM
+  component "Repositories\nAuth, Trip, Pricing,\nAnalytics" as Repo
+  component "Retrofit API client\nBusOptimaApi" as Api
+  component "OkHttp + AuthInterceptor" as Http
+  database "DataStore\naccess/refresh token,\nprofile data" as Store
+}
+
+cloud "Backend BusOptima\nREST API" as Backend
+database "PostgreSQL\nсерверної частини" as Db
+node "IoT-клієнт ESP32\nпідрахунок пасажирів" as Iot
+
+User --> UI : взаємодія з екранами
+App --> Activity
+Activity --> Nav
+Nav --> UI
+UI --> VM
+VM --> Repo
+Repo --> Api
+Api --> Http
+Http --> Backend : HTTPS/REST + JWT
+Repo --> Store : читання і запис токенів
+Http --> Store : Bearer token
+Backend --> Db
+Iot --> Backend : події пасажиропотоку
+Backend --> Http : JSON-відповіді
+@enduml
