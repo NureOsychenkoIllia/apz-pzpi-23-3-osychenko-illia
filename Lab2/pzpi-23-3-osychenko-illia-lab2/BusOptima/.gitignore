@@ -1,0 +1,38 @@
+# Built artifacts
+*.iml
+/build
+/captures
+
+# Gradle
+.gradle
+gradle/wrapper/gradle-wrapper.jar
+
+# Local config (contains SDK path, secrets)
+local.properties
+*.properties
+
+# IntelliJ / Android Studio
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/.gitignore
+
+# Native build
+.externalNativeBuild
+.cxx
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kotlin
+.kotlin/
+
+# Keystore / signing (never commit)
+*.jks
+*.keystore
+keystore.properties
