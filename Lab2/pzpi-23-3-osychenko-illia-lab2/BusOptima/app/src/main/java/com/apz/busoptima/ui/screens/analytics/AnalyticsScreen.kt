@@ -9,10 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.apz.busoptima.R
 import com.apz.busoptima.data.api.dto.DashboardDto
 import com.apz.busoptima.data.api.dto.ProfitabilityDto
 import com.apz.busoptima.data.api.dto.RouteProfitabilityDto
@@ -20,14 +23,14 @@ import com.apz.busoptima.data.api.dto.RouteProfitabilityDto
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(viewModel: AnalyticsViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
-            title = { Text("Аналітика") },
+            title = { Text(stringResource(R.string.nav_analytics)) },
             actions = {
                 IconButton(onClick = viewModel::loadAll) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Оновити")
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.action_refresh))
                 }
             }
         )
@@ -43,7 +46,9 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel = hiltViewModel()) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(uiState.error!!, color = MaterialTheme.colorScheme.error)
                         Spacer(Modifier.height(16.dp))
-                        Button(onClick = viewModel::loadAll) { Text("Повторити") }
+                        Button(onClick = viewModel::loadAll) {
+                            Text(stringResource(R.string.action_retry))
+                        }
                     }
                 }
             }
@@ -61,7 +66,7 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel = hiltViewModel()) {
                         if (profitability.byRoute.isNotEmpty()) {
                             item {
                                 Text(
-                                    text = "По маршрутах",
+                                    text = stringResource(R.string.analytics_by_routes),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -85,7 +90,7 @@ private fun DashboardSection(dashboard: DashboardDto) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Поточний стан",
+                text = stringResource(R.string.section_current_state),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary
@@ -96,10 +101,12 @@ private fun DashboardSection(dashboard: DashboardDto) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                MetricItem("Активних рейсів", "${dashboard.activeTrips}", MaterialTheme.colorScheme.primary)
-                MetricItem("Пасажирів", "${dashboard.totalPassengers}", MaterialTheme.colorScheme.secondary)
+                MetricItem(stringResource(R.string.metric_active_trips),
+                    "${dashboard.activeTrips}", MaterialTheme.colorScheme.primary)
+                MetricItem(stringResource(R.string.metric_passengers),
+                    "${dashboard.totalPassengers}", MaterialTheme.colorScheme.secondary)
                 MetricItem(
-                    "Завантаженість",
+                    stringResource(R.string.metric_occupancy),
                     "${"%.0f".format(dashboard.avgOccupancy * 100)}%",
                     MaterialTheme.colorScheme.tertiary
                 )
@@ -114,16 +121,15 @@ private fun DashboardSection(dashboard: DashboardDto) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Виручка (7 днів)", style = MaterialTheme.typography.labelSmall,
+                    Text(stringResource(R.string.metric_revenue_7d),
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(
-                        "₴${"%.0f".format(dashboard.totalRevenue)}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
+                    Text("₴${"%.0f".format(dashboard.totalRevenue)}",
+                        fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Прибуток (7 днів)", style = MaterialTheme.typography.labelSmall,
+                    Text(stringResource(R.string.metric_profit_7d),
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
                         "₴${"%.0f".format(dashboard.totalProfit)}",
@@ -139,12 +145,12 @@ private fun DashboardSection(dashboard: DashboardDto) {
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ProfitChip(
-                    label = "${dashboard.profitableTrips} прибуткових",
+                    label = stringResource(R.string.trips_profitable, dashboard.profitableTrips),
                     isProfit = true,
                     modifier = Modifier.weight(1f)
                 )
                 ProfitChip(
-                    label = "${dashboard.unprofitableTrips} збиткових",
+                    label = stringResource(R.string.trips_unprofitable, dashboard.unprofitableTrips),
                     isProfit = false,
                     modifier = Modifier.weight(1f)
                 )
@@ -156,17 +162,9 @@ private fun DashboardSection(dashboard: DashboardDto) {
 @Composable
 private fun MetricItem(label: String, value: String, color: androidx.compose.ui.graphics.Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Text(text = value, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = color)
+        Text(text = label, style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -174,8 +172,8 @@ private fun MetricItem(label: String, value: String, color: androidx.compose.ui.
 private fun ProfitChip(label: String, isProfit: Boolean, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
-        color = (if (isProfit) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.errorContainer),
+        color = if (isProfit) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.small
     ) {
         Text(
@@ -196,18 +194,18 @@ private fun ProfitabilitySummarySection(profitability: ProfitabilityDto) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Прибутковість (30 днів)",
+                text = stringResource(R.string.section_profitability_30d),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(12.dp))
             with(profitability.summary) {
-                InfoRow("Рейсів", "$totalTrips")
-                InfoRow("Пасажирів", "$totalPassengers")
-                InfoRow("Виручка", "₴${"%.2f".format(totalRevenue)}")
-                InfoRow("Витрати", "₴${"%.2f".format(totalCosts)}")
-                InfoRow("Прибуток") {
+                InfoRow(stringResource(R.string.label_trips_count), "$totalTrips")
+                InfoRow(stringResource(R.string.metric_passengers), "$totalPassengers")
+                InfoRow(stringResource(R.string.label_revenue), "₴${"%.2f".format(totalRevenue)}")
+                InfoRow(stringResource(R.string.label_costs), "₴${"%.2f".format(totalCosts)}")
+                InfoRow(stringResource(R.string.label_profit)) {
                     Text(
                         "₴${"%.2f".format(totalProfit)}",
                         fontWeight = FontWeight.Bold,
@@ -215,8 +213,10 @@ private fun ProfitabilitySummarySection(profitability: ProfitabilityDto) {
                                 else MaterialTheme.colorScheme.error
                     )
                 }
-                InfoRow("Середня рентабельність", "${"%.1f".format(averageProfitability)}%")
-                InfoRow("Середня завантаженість", "${"%.1f".format(avgOccupancy * 100)}%")
+                InfoRow(stringResource(R.string.label_avg_profitability),
+                    "${"%.1f".format(averageProfitability)}%")
+                InfoRow(stringResource(R.string.label_avg_occupancy),
+                    "${"%.1f".format(avgOccupancy * 100)}%")
             }
         }
     }
@@ -244,10 +244,12 @@ private fun RouteProfitabilityCard(route: RouteProfitabilityDto) {
             }
             Spacer(Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                InfoSmall("Рейсів", "${route.tripsCount}")
-                InfoSmall("Пасажирів", "${route.totalPassengers}")
-                InfoSmall("Завантаженість", "${"%.0f".format(route.avgOccupancy * 100)}%")
-                InfoSmall("Рентабельність", "${"%.1f".format(route.profitability)}%")
+                InfoSmall(stringResource(R.string.label_trips_count), "${route.tripsCount}")
+                InfoSmall(stringResource(R.string.metric_passengers), "${route.totalPassengers}")
+                InfoSmall(stringResource(R.string.route_occupancy),
+                    "${"%.0f".format(route.avgOccupancy * 100)}%")
+                InfoSmall(stringResource(R.string.route_profitability),
+                    "${"%.1f".format(route.profitability)}%")
             }
         }
     }
@@ -255,15 +257,18 @@ private fun RouteProfitabilityCard(route: RouteProfitabilityDto) {
 
 @Composable
 private fun CategoryChip(category: String) {
-    val (color, label) = when (category) {
-        "highly_profitable" -> MaterialTheme.colorScheme.primary to "Висока"
-        "profitable" -> MaterialTheme.colorScheme.secondary to "Прибуткова"
-        "break_even" -> MaterialTheme.colorScheme.tertiary to "Беззбиткова"
-        else -> MaterialTheme.colorScheme.error to "Збиткова"
+    val (color, labelRes) = when (category) {
+        "high_profit", "highly_profitable" ->
+            MaterialTheme.colorScheme.primary to R.string.category_highly_profitable
+        "normal", "profitable" ->
+            MaterialTheme.colorScheme.secondary to R.string.category_profitable
+        "low_profit", "break_even" ->
+            MaterialTheme.colorScheme.tertiary to R.string.category_break_even
+        else -> MaterialTheme.colorScheme.error to R.string.category_unprofitable
     }
     Surface(color = color.copy(alpha = 0.15f), shape = MaterialTheme.shapes.small) {
         Text(
-            text = label,
+            text = stringResource(labelRes),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             style = MaterialTheme.typography.labelSmall,
             color = color,
@@ -275,9 +280,7 @@ private fun CategoryChip(category: String) {
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 3.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -289,9 +292,7 @@ private fun InfoRow(label: String, value: String) {
 @Composable
 private fun InfoRow(label: String, valueContent: @Composable () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 3.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

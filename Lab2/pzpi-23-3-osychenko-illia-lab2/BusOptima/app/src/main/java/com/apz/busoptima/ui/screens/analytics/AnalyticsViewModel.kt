@@ -2,6 +2,7 @@ package com.apz.busoptima.ui.screens.analytics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.apz.busoptima.app.AppResumeCoordinator
 import com.apz.busoptima.data.api.dto.DashboardDto
 import com.apz.busoptima.data.api.dto.ProfitabilityDto
 import com.apz.busoptima.data.repository.AnalyticsRepository
@@ -22,7 +23,8 @@ data class AnalyticsUiState(
 
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val appResumeCoordinator: AppResumeCoordinator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AnalyticsUiState())
@@ -30,6 +32,11 @@ class AnalyticsViewModel @Inject constructor(
 
     init {
         loadAll()
+        viewModelScope.launch {
+            appResumeCoordinator.appResumed.collect {
+                loadAll()
+            }
+        }
     }
 
     fun loadAll() {

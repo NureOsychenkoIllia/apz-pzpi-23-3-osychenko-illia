@@ -9,12 +9,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.apz.busoptima.R
 import com.apz.busoptima.ui.screens.analytics.AnalyticsScreen
 import com.apz.busoptima.ui.screens.login.LoginScreen
 import com.apz.busoptima.ui.screens.login.LoginViewModel
@@ -38,15 +40,19 @@ data class BottomNavItem(
     val icon: ImageVector
 )
 
-val bottomNavItems = listOf(
-    BottomNavItem(Screen.Trips, "Рейси", Icons.Default.DirectionsBus),
-    BottomNavItem(Screen.Analytics, "Аналітика", Icons.Default.Analytics),
-    BottomNavItem(Screen.Profile, "Профіль", Icons.Default.Person),
-)
+@Composable
+private fun rememberBottomNavItems(isDriver: Boolean) = buildList {
+    add(BottomNavItem(Screen.Trips, stringResource(R.string.nav_trips), Icons.Default.DirectionsBus))
+    if (!isDriver) {
+        add(BottomNavItem(Screen.Analytics, stringResource(R.string.nav_analytics), Icons.Default.Analytics))
+    }
+    add(BottomNavItem(Screen.Profile, stringResource(R.string.nav_profile), Icons.Default.Person))
+}
 
 @Composable
-fun AppNavigation(isLoggedIn: Boolean) {
+fun AppNavigation(isLoggedIn: Boolean, userRole: String?) {
     val navController = rememberNavController()
+    val isDriver = userRole == "driver"
 
     NavHost(
         navController = navController,
@@ -65,8 +71,9 @@ fun AppNavigation(isLoggedIn: Boolean) {
         }
 
         composable(Screen.Trips.route) {
-            MainScaffold(navController, Screen.Trips) {
+            MainScaffold(navController, Screen.Trips, isDriver) {
                 TripsScreen(
+                    isDriver = isDriver,
                     onTripClick = { tripId ->
                         navController.navigate(Screen.TripDetail.createRoute(tripId))
                     }
@@ -81,18 +88,19 @@ fun AppNavigation(isLoggedIn: Boolean) {
             val tripId = backStackEntry.arguments?.getLong("tripId") ?: return@composable
             TripDetailScreen(
                 tripId = tripId,
+                isDriver = isDriver,
                 onBack = { navController.popBackStack() }
             )
         }
 
         composable(Screen.Analytics.route) {
-            MainScaffold(navController, Screen.Analytics) {
+            MainScaffold(navController, Screen.Analytics, isDriver) {
                 AnalyticsScreen()
             }
         }
 
         composable(Screen.Profile.route) {
-            MainScaffold(navController, Screen.Profile) {
+            MainScaffold(navController, Screen.Profile, isDriver) {
                 ProfileScreen(
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
@@ -109,15 +117,17 @@ fun AppNavigation(isLoggedIn: Boolean) {
 private fun MainScaffold(
     navController: androidx.navigation.NavHostController,
     currentScreen: Screen,
+    isDriver: Boolean,
     content: @Composable () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val visibleItems = rememberBottomNavItems(isDriver)
 
     Scaffold(
         bottomBar = {
             NavigationBar {
-                bottomNavItems.forEach { item ->
+                visibleItems.forEach { item ->
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.label) },
                         label = { Text(item.label) },
@@ -136,9 +146,7 @@ private fun MainScaffold(
             }
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier.padding(paddingValues)
-        ) {
+        Box(modifier = Modifier.padding(paddingValues)) {
             content()
         }
     }

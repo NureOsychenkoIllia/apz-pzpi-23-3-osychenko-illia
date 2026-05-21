@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">BusOptima</string>
+    <string name="app_subtitle">Trip Monitoring System</string>
+
+    <!-- Common actions -->
+    <string name="action_refresh">Refresh</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_back">Back</string>
+
+    <!-- Login -->
+    <string name="login_password">Password</string>
+    <string name="login_show_password">Show password</string>
+    <string name="login_hide_password">Hide password</string>
+    <string name="login_button">Sign In</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_trips">Trips</string>
+    <string name="nav_analytics">Analytics</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Trip filters -->
+    <string name="filter_all">All</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_scheduled">Scheduled</string>
+    <string name="filter_completed">Completed</string>
+
+    <!-- Trips screen -->
+    <string name="trips_empty">No trips found</string>
+    <string name="trip_route_fallback">Route #%d</string>
+    <string name="trip_card_departure">Departure</string>
+    <string name="trip_card_passengers">Passengers</string>
+    <string name="trip_card_driver">Driver</string>
+    <string name="driver_trips_title">My Trips</string>
+    <string name="driver_trips_hint">For the driver role, the main flow is focused on the current trip, passenger count, and recommended ticket price.</string>
+
+    <!-- Trip detail -->
+    <string name="trip_detail_title_fallback">Trip #%d</string>
+    <string name="trip_detail_load_error">Failed to load</string>
+    <string name="section_trip_info">Trip Information</string>
+    <string name="label_route">Route</string>
+    <string name="label_departure">Departure</string>
+    <string name="label_actual_departure">Actual Departure</string>
+    <string name="label_arrival">Arrival</string>
+    <string name="label_driver">Driver</string>
+    <string name="label_bus">Bus</string>
+    <string name="label_status">Status</string>
+    <string name="section_passengers">Passengers</string>
+    <string name="passengers_of_seats">of %d seats</string>
+    <string name="passengers_occupancy">occupancy</string>
+    <string name="section_pricing">Dynamic Pricing</string>
+    <string name="label_base_price">Base Price</string>
+    <string name="label_recommended_price">Recommended Price</string>
+    <string name="label_price_change">Price Change</string>
+    <string name="label_demand_coef">Demand Coef.</string>
+    <string name="label_time_coef">Time Coef.</string>
+    <string name="label_day_coef">Day Coef.</string>
+    <string name="button_calculate_price">Calculate Price</string>
+    <string name="button_recalculate_price">Recalculate Price</string>
+    <string name="section_trip_analytics">Trip Analytics</string>
+    <string name="label_total_passengers">Total Passengers</string>
+    <string name="label_max_passengers">Max Passengers</string>
+    <string name="label_avg_occupancy">Avg Occupancy</string>
+    <string name="label_revenue">Revenue</string>
+    <string name="label_costs">Costs</string>
+    <string name="label_profit">Profit</string>
+    <string name="label_profitability">Profitability</string>
+    <string name="label_avg_profitability">Avg Profitability</string>
+    <string name="section_status_management">Status Management</string>
+    <string name="button_start_trip">Start Trip</string>
+    <string name="button_cancel_trip">Cancel</string>
+    <string name="button_complete_trip">Complete Trip</string>
+    <string name="section_driver_panel">Driver Panel</string>
+    <string name="driver_current_trip_label">Current Trip</string>
+    <string name="driver_price_label">Recommended Sale Price</string>
+    <string name="driver_manual_counter_label">Manual passenger adjustment</string>
+    <string name="driver_manual_note">Adjustment works locally in the mobile client and is immediately used for recommended price recalculation.</string>
+    <string name="section_event_log">Event Log</string>
+    <string name="events_empty">No trip events yet</string>
+    <string name="event_entry">Passenger Entry</string>
+    <string name="event_exit">Passenger Exit</string>
+    <string name="event_passenger_count">After event: %d</string>
+
+    <!-- Trip statuses -->
+    <string name="status_boarding">Boarding</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_cancelled">Cancelled</string>
+
+    <!-- Analytics -->
+    <string name="section_current_state">Current Status</string>
+    <string name="metric_active_trips">Active Trips</string>
+    <string name="metric_passengers">Passengers</string>
+    <string name="metric_occupancy">Occupancy</string>
+    <string name="metric_revenue_7d">Revenue (7 days)</string>
+    <string name="metric_profit_7d">Profit (7 days)</string>
+    <string name="trips_profitable">%d profitable</string>
+    <string name="trips_unprofitable">%d unprofitable</string>
+    <string name="section_profitability_30d">Profitability (30 days)</string>
+    <string name="label_trips_count">Trips</string>
+    <string name="analytics_by_routes">By Routes</string>
+    <string name="route_occupancy">Occupancy</string>
+    <string name="route_profitability">Profitability</string>
+    <string name="category_highly_profitable">Highly Profitable</string>
+    <string name="category_profitable">Profitable</string>
+    <string name="category_break_even">Break-even</string>
+    <string name="category_unprofitable">Unprofitable</string>
+
+    <!-- Profile -->
+    <string name="logout_dialog_title">Sign out?</string>
+    <string name="logout_dialog_message">Are you sure you want to sign out?</string>
+    <string name="button_logout">Sign Out</string>
+    <string name="label_email">Email</string>
+    <string name="label_role">Role</string>
+    <string name="label_app">Application</string>
+    <string name="label_version">Version</string>
+    <string name="button_logout_full">Sign Out</string>
+    <string name="role_admin">Administrator</string>
+    <string name="role_dispatcher">Dispatcher</string>
+    <string name="role_driver">Driver</string>
+    <string name="role_analyst">Analyst</string>
+    <string name="label_language">Language</string>
+    <string name="lang_ukrainian">Українська</string>
+    <string name="lang_english">English</string>
+
+    <!-- Errors / success messages -->
+    <string name="error_fill_all_fields">Please fill in all fields</string>
+    <string name="status_updated">Status updated</string>
+    <string name="passenger_count_adjusted">Passenger count adjusted: %1$d</string>
+</resources>

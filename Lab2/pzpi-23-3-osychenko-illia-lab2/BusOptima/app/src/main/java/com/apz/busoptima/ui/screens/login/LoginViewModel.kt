@@ -1,7 +1,9 @@
 package com.apz.busoptima.ui.screens.login
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.apz.busoptima.R
 import com.apz.busoptima.data.repository.AuthRepository
 import com.apz.busoptima.data.repository.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +23,9 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    application: Application,
     private val authRepository: AuthRepository
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -38,7 +41,7 @@ class LoginViewModel @Inject constructor(
     fun login() {
         val state = _uiState.value
         if (state.email.isBlank() || state.password.isBlank()) {
-            _uiState.value = state.copy(error = "Заповніть всі поля")
+            _uiState.value = state.copy(error = getApplication<Application>().getString(R.string.error_fill_all_fields))
             return
         }
 

@@ -1,3 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">BusOptima</string>
+    <string name="app_subtitle">Система моніторингу рейсів</string>
+
+    <!-- Common actions -->
+    <string name="action_refresh">Оновити</string>
+    <string name="action_retry">Повторити</string>
+    <string name="action_cancel">Скасувати</string>
+    <string name="action_back">Назад</string>
+
+    <!-- Login -->
+    <string name="login_password">Пароль</string>
+    <string name="login_show_password">Показати пароль</string>
+    <string name="login_hide_password">Сховати пароль</string>
+    <string name="login_button">Увійти</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_trips">Рейси</string>
+    <string name="nav_analytics">Аналітика</string>
+    <string name="nav_profile">Профіль</string>
+
+    <!-- Trip filters -->
+    <string name="filter_all">Усі</string>
+    <string name="filter_active">Активні</string>
+    <string name="filter_scheduled">Заплановані</string>
+    <string name="filter_completed">Завершені</string>
+
+    <!-- Trips screen -->
+    <string name="trips_empty">Рейси не знайдено</string>
+    <string name="trip_route_fallback">Маршрут #%d</string>
+    <string name="trip_card_departure">Відправлення</string>
+    <string name="trip_card_passengers">Пасажири</string>
+    <string name="trip_card_driver">Водій</string>
+    <string name="driver_trips_title">Мої рейси</string>
+    <string name="driver_trips_hint">Для водія головний сценарій зосереджений на поточному рейсі, пасажирах та рекомендованій ціні.</string>
+
+    <!-- Trip detail -->
+    <string name="trip_detail_title_fallback">Рейс #%d</string>
+    <string name="trip_detail_load_error">Помилка завантаження</string>
+    <string name="section_trip_info">Інформація про рейс</string>
+    <string name="label_route">Маршрут</string>
+    <string name="label_departure">Відправлення</string>
+    <string name="label_actual_departure">Фактичне відправлення</string>
+    <string name="label_arrival">Прибуття</string>
+    <string name="label_driver">Водій</string>
+    <string name="label_bus">Автобус</string>
+    <string name="label_status">Статус</string>
+    <string name="section_passengers">Пасажири</string>
+    <string name="passengers_of_seats">з %d місць</string>
+    <string name="passengers_occupancy">завантаженість</string>
+    <string name="section_pricing">Динамічне ціноутворення</string>
+    <string name="label_base_price">Базова ціна</string>
+    <string name="label_recommended_price">Рекомендована ціна</string>
+    <string name="label_price_change">Зміна ціни</string>
+    <string name="label_demand_coef">Коеф. попиту</string>
+    <string name="label_time_coef">Коеф. часу</string>
+    <string name="label_day_coef">Коеф. дня</string>
+    <string name="button_calculate_price">Розрахувати ціну</string>
+    <string name="button_recalculate_price">Перерахувати ціну</string>
+    <string name="section_trip_analytics">Аналітика рейсу</string>
+    <string name="label_total_passengers">Всього пасажирів</string>
+    <string name="label_max_passengers">Макс. пасажирів</string>
+    <string name="label_avg_occupancy">Середня завантаженість</string>
+    <string name="label_revenue">Виручка</string>
+    <string name="label_costs">Витрати</string>
+    <string name="label_profit">Прибуток</string>
+    <string name="label_profitability">Рентабельність</string>
+    <string name="label_avg_profitability">Середня рентабельність</string>
+    <string name="section_status_management">Управління статусом</string>
+    <string name="button_start_trip">Розпочати рейс</string>
+    <string name="button_cancel_trip">Скасувати</string>
+    <string name="button_complete_trip">Завершити рейс</string>
+    <string name="section_driver_panel">Панель водія</string>
+    <string name="driver_current_trip_label">Поточний рейс</string>
+    <string name="driver_price_label">Рекомендована ціна для продажу</string>
+    <string name="driver_manual_counter_label">Ручне коригування пасажирів</string>
+    <string name="driver_manual_note">Коригування діє локально в мобільному клієнті й одразу використовується для перерахунку рекомендованої ціни.</string>
+    <string name="section_event_log">Журнал подій</string>
+    <string name="events_empty">Події рейсу відсутні</string>
+    <string name="event_entry">Вхід пасажира</string>
+    <string name="event_exit">Вихід пасажира</string>
+    <string name="event_passenger_count">Після події: %d</string>
+
+    <!-- Trip statuses -->
+    <string name="status_boarding">Посадка</string>
+    <string name="status_in_progress">В дорозі</string>
+    <string name="status_scheduled">Заплановано</string>
+    <string name="status_completed">Завершено</string>
+    <string name="status_cancelled">Скасовано</string>
+
+    <!-- Analytics -->
+    <string name="section_current_state">Поточний стан</string>
+    <string name="metric_active_trips">Активних рейсів</string>
+    <string name="metric_passengers">Пасажирів</string>
+    <string name="metric_occupancy">Завантаженість</string>
+    <string name="metric_revenue_7d">Виручка (7 днів)</string>
+    <string name="metric_profit_7d">Прибуток (7 днів)</string>
+    <string name="trips_profitable">%d прибуткових</string>
+    <string name="trips_unprofitable">%d збиткових</string>
+    <string name="section_profitability_30d">Прибутковість (30 днів)</string>
+    <string name="label_trips_count">Рейсів</string>
+    <string name="analytics_by_routes">По маршрутах</string>
+    <string name="route_occupancy">Завантаженість</string>
+    <string name="route_profitability">Рентабельність</string>
+    <string name="category_highly_profitable">Високоприбуткова</string>
+    <string name="category_profitable">Прибуткова</string>
+    <string name="category_break_even">Беззбиткова</string>
+    <string name="category_unprofitable">Збиткова</string>
+
+    <!-- Profile -->
+    <string name="logout_dialog_title">Вийти з системи?</string>
+    <string name="logout_dialog_message">Ви впевнені, що хочете вийти з системи?</string>
+    <string name="button_logout">Вийти</string>
+    <string name="label_email">Email</string>
+    <string name="label_role">Роль</string>
+    <string name="label_app">Застосунок</string>
+    <string name="label_version">Версія</string>
+    <string name="button_logout_full">Вийти з системи</string>
+    <string name="role_admin">Адміністратор</string>
+    <string name="role_dispatcher">Диспетчер</string>
+    <string name="role_driver">Водій</string>
+    <string name="role_analyst">Аналітик</string>
+    <string name="label_language">Мова</string>
+    <string name="lang_ukrainian">Українська</string>
+    <string name="lang_english">English</string>
+
+    <!-- Errors / success messages -->
+    <string name="error_fill_all_fields">Заповніть всі поля</string>
+    <string name="status_updated">Статус оновлено</string>
+    <string name="passenger_count_adjusted">Лічильник пасажирів змінено: %1$d</string>
 </resources>

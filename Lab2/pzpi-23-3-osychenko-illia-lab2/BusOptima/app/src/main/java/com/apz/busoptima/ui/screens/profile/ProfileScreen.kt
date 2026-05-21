@@ -1,17 +1,26 @@
 package com.apz.busoptima.ui.screens.profile
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.apz.busoptima.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,8 +28,11 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     onLogout: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    var showLogoutDialog by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
+    var currentLang by rememberSaveable { mutableStateOf(prefs.getString("language", "uk") ?: "uk") }
 
     LaunchedEffect(uiState.isLoading) {
         if (uiState.isLoading && uiState.email.isEmpty()) {
@@ -31,33 +43,35 @@ fun ProfileScreen(
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Вийти з системи?") },
-            text = { Text("Ви впевнені, що хочете вийти з системи?") },
+            title = { Text(stringResource(R.string.logout_dialog_title)) },
+            text = { Text(stringResource(R.string.logout_dialog_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showLogoutDialog = false
                     viewModel.logout()
                     onLogout()
-                }) { Text("Вийти") }
+                }) { Text(stringResource(R.string.button_logout)) }
             },
             dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) { Text("Скасувати") }
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             }
         )
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(title = { Text("Профіль") })
+        TopAppBar(title = { Text(stringResource(R.string.nav_profile)) })
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(24.dp))
 
-            // Avatar
             Surface(
                 modifier = Modifier.size(96.dp),
                 shape = CircleShape,
@@ -88,7 +102,6 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // Info card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -96,21 +109,20 @@ fun ProfileScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     ProfileInfoRow(
                         icon = Icons.Default.Email,
-                        label = "Email",
+                        label = stringResource(R.string.label_email),
                         value = uiState.email
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     ProfileInfoRow(
                         icon = Icons.Default.Badge,
-                        label = "Роль",
+                        label = stringResource(R.string.label_role),
                         value = roleDisplayName(uiState.role)
                     )
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // App info card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -118,37 +130,95 @@ fun ProfileScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     ProfileInfoRow(
                         icon = Icons.Default.DirectionsBus,
-                        label = "Застосунок",
+                        label = stringResource(R.string.label_app),
                         value = "BusOptima"
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     ProfileInfoRow(
                         icon = Icons.Default.Info,
-                        label = "Версія",
+                        label = stringResource(R.string.label_version),
                         value = "1.0.0"
                     )
                 }
             }
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(16.dp))
+
+            // Language switcher
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = stringResource(R.string.label_language),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = currentLang == "uk",
+                            onClick = {
+                                if (currentLang != "uk") {
+                                    prefs.edit().putString("language", "uk").apply()
+                                    currentLang = "uk"
+                                    (context as? Activity)?.recreate()
+                                }
+                            },
+                            label = { Text(stringResource(R.string.lang_ukrainian)) }
+                        )
+                        FilterChip(
+                            selected = currentLang == "en",
+                            onClick = {
+                                if (currentLang != "en") {
+                                    prefs.edit().putString("language", "en").apply()
+                                    currentLang = "en"
+                                    (context as? Activity)?.recreate()
+                                }
+                            },
+                            label = { Text(stringResource(R.string.lang_english)) }
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
 
             OutlinedButton(
                 onClick = { showLogoutDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = MaterialTheme.colorScheme.error
                 )
             ) {
                 Icon(Icons.Default.Logout, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Вийти з системи", fontSize = 16.sp)
+                Text(stringResource(R.string.button_logout_full), fontSize = 16.sp)
             }
 
             Spacer(Modifier.height(16.dp))
         }
     }
+}
+
+@Composable
+private fun roleDisplayName(role: String): String = when (role) {
+    "admin" -> stringResource(R.string.role_admin)
+    "dispatcher" -> stringResource(R.string.role_dispatcher)
+    "driver" -> stringResource(R.string.role_driver)
+    "analyst" -> stringResource(R.string.role_analyst)
+    else -> role.replaceFirstChar { it.uppercase() }
 }
 
 @Composable
@@ -181,12 +251,4 @@ private fun ProfileInfoRow(
             )
         }
     }
-}
-
-private fun roleDisplayName(role: String): String = when (role) {
-    "admin" -> "Адміністратор"
-    "dispatcher" -> "Диспетчер"
-    "driver" -> "Водій"
-    "analyst" -> "Аналітик"
-    else -> role.replaceFirstChar { it.uppercase() }
 }

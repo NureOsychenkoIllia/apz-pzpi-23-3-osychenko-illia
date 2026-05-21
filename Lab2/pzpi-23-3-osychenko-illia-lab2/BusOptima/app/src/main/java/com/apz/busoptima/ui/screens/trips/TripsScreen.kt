@@ -11,9 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.apz.busoptima.R
 import com.apz.busoptima.data.api.dto.TripDto
 import com.apz.busoptima.ui.util.formatDateTime
 import com.apz.busoptima.ui.util.tripStatusColor
@@ -22,32 +25,47 @@ import com.apz.busoptima.ui.util.tripStatusLabel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripsScreen(
+    isDriver: Boolean = false,
     viewModel: TripsViewModel = hiltViewModel(),
     onTripClick: (Long) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
-            title = { Text("Рейси") },
+            title = {
+                Text(
+                    stringResource(
+                        if (isDriver) R.string.driver_trips_title else R.string.nav_trips
+                    )
+                )
+            },
             actions = {
                 IconButton(onClick = viewModel::loadTrips) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Оновити")
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.action_refresh))
                 }
             }
         )
 
-        // Filter chips
-        LazyRow(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(TripFilter.entries.toTypedArray()) { filter ->
-                FilterChip(
-                    selected = uiState.selectedFilter == filter,
-                    onClick = { viewModel.setFilter(filter) },
-                    label = { Text(filter.label) }
-                )
+        if (isDriver) {
+            Text(
+                text = stringResource(R.string.driver_trips_hint),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(TripFilter.entries.toTypedArray()) { filter ->
+                    FilterChip(
+                        selected = uiState.selectedFilter == filter,
+                        onClick = { viewModel.setFilter(filter) },
+                        label = { Text(stringResource(filter.labelRes)) }
+                    )
+                }
             }
         }
 
@@ -66,13 +84,15 @@ fun TripsScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = viewModel::loadTrips) { Text("Повторити") }
+                        Button(onClick = viewModel::loadTrips) {
+                            Text(stringResource(R.string.action_retry))
+                        }
                     }
                 }
             }
             uiState.trips.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Рейси не знайдено", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.trips_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             else -> {
@@ -106,7 +126,7 @@ fun TripCard(trip: TripDto, onClick: () -> Unit) {
             ) {
                 Text(
                     text = trip.route?.let { "${it.originCity} → ${it.destinationCity}" }
-                        ?: "Маршрут #${trip.routeId}",
+                        ?: stringResource(R.string.trip_route_fallback, trip.routeId),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -119,12 +139,18 @@ fun TripCard(trip: TripDto, onClick: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                InfoColumn(label = "Відправлення", value = formatDateTime(trip.scheduledDeparture))
                 InfoColumn(
-                    label = "Пасажири",
+                    label = stringResource(R.string.trip_card_departure),
+                    value = formatDateTime(trip.scheduledDeparture)
+                )
+                InfoColumn(
+                    label = stringResource(R.string.trip_card_passengers),
                     value = "${trip.currentPassengers}/${trip.bus?.capacity ?: "?"}"
                 )
-                InfoColumn(label = "Водій", value = trip.driverName.take(20))
+                InfoColumn(
+                    label = stringResource(R.string.trip_card_driver),
+                    value = trip.driverName.take(20)
+                )
             }
 
             if (trip.bus != null) {

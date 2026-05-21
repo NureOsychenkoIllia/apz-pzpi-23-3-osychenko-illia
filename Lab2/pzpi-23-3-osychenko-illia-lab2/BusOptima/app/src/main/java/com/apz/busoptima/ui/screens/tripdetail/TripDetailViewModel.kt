@@ -1,9 +1,13 @@
 package com.apz.busoptima.ui.screens.tripdetail
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.apz.busoptima.R
+import com.apz.busoptima.app.AppResumeCoordinator
 import com.apz.busoptima.data.api.dto.PriceRecommendationDto
+import com.apz.busoptima.data.api.dto.PassengerEventDto
 import com.apz.busoptima.data.api.dto.TripAnalyticsDto
 import com.apz.busoptima.data.api.dto.TripDto
 import com.apz.busoptima.data.repository.PricingRepository
@@ -22,8 +26,11 @@ import javax.inject.Inject
 data class TripDetailUiState(
     val trip: TripDto? = null,
     val analytics: TripAnalyticsDto? = null,
+    val events: List<PassengerEventDto> = emptyList(),
     val priceRecommendation: PriceRecommendationDto? = null,
+    val manualPassengerCount: Int? = null,
     val isLoading: Boolean = false,
+    val isEventsLoading: Boolean = false,
     val isUpdating: Boolean = false,
     val isPriceLoading: Boolean = false,
     val error: String? = null,
@@ -32,10 +39,12 @@ data class TripDetailUiState(
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
+    application: Application,
     savedStateHandle: SavedStateHandle,
     private val tripRepository: TripRepository,
-    private val pricingRepository: PricingRepository
-) : ViewModel() {
+    private val pricingRepository: PricingRepository,
+    private val appResumeCoordinator: AppResumeCoordinator
+) : AndroidViewModel(application) {
 
     private val tripId: Long = checkNotNull(savedStateHandle["tripId"])
 
@@ -44,6 +53,11 @@ class TripDetailViewModel @Inject constructor(
 
     init {
         loadTrip()
+        viewModelScope.launch {
+            appResumeCoordinator.appResumed.collect {
+                loadTrip()
+            }
+        }
     }
 
     fun loadTrip() {
@@ -53,6 +67,7 @@ class TripDetailViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.value = _uiState.value.copy(trip = result.data, isLoading = false)
                     loadAnalytics()
+                    loadEvents()
                 }
                 is Result.Error -> {
                     _uiState.value = _uiState.value.copy(isLoading = false, error = result.message)
@@ -73,10 +88,28 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
+    private fun loadEvents() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isEventsLoading = true)
+            when (val result = tripRepository.getTripEvents(tripId)) {
+                is Result.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        events = result.data.sortedByDescending { it.timestamp },
+                        isEventsLoading = false
+                    )
+                }
+                else -> {
+                    _uiState.value = _uiState.value.copy(isEventsLoading = false)
+                }
+            }
+        }
+    }
+
     fun calculatePrice() {
         val trip = _uiState.value.trip ?: return
         val route = trip.route ?: return
         val bus = trip.bus ?: return
+        val currentPassengers = _uiState.value.manualPassengerCount ?: trip.currentPassengers
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isPriceLoading = true)
@@ -89,7 +122,7 @@ class TripDetailViewModel @Inject constructor(
             }
             when (val result = pricingRepository.calculatePrice(
                 basePrice = route.basePrice,
-                currentPassengers = trip.currentPassengers,
+                currentPassengers = currentPassengers,
                 capacity = bus.capacity,
                 departureTime = departureTime
             )) {
@@ -110,6 +143,25 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
+    fun adjustPassengerCount(delta: Int) {
+        val trip = _uiState.value.trip ?: return
+        val capacity = trip.bus?.capacity ?: Int.MAX_VALUE
+        val current = _uiState.value.manualPassengerCount ?: trip.currentPassengers
+        val adjusted = (current + delta).coerceIn(0, capacity)
+        if (adjusted == current) return
+
+        _uiState.value = _uiState.value.copy(
+            manualPassengerCount = adjusted,
+            updateSuccess = getApplication<Application>().getString(
+                R.string.passenger_count_adjusted,
+                adjusted
+            ),
+            priceRecommendation = null
+        )
+
+        calculatePrice()
+    }
+
     fun updateStatus(newStatus: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUpdating = true)
@@ -117,8 +169,9 @@ class TripDetailViewModel @Inject constructor(
                 is Result.Success -> {
                     _uiState.value = _uiState.value.copy(
                         trip = result.data,
+                        manualPassengerCount = null,
                         isUpdating = false,
-                        updateSuccess = "Статус оновлено"
+                        updateSuccess = getApplication<Application>().getString(R.string.status_updated)
                     )
                 }
                 is Result.Error -> {
