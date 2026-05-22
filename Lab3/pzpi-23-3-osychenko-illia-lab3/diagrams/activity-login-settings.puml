@@ -1,0 +1,72 @@
+@startuml activity-login-settings
+skinparam monochrome true
+skinparam backgroundColor #FFFFFF
+skinparam ActivityBorderColor #1A3A6B
+skinparam ActivityBackgroundColor #EBF0FA
+skinparam ActivityDiamondBorderColor #1A3A6B
+skinparam ActivityDiamondBackgroundColor #D4E0F5
+skinparam ArrowColor #1A3A6B
+skinparam PartitionBorderColor #1A3A6B
+skinparam PartitionBackgroundColor #F5F8FF
+skinparam titleFontSize 16
+skinparam titleFontStyle bold
+
+title Діаграма діяльності — Авторизація та налаштування системи
+
+|Користувач|
+start
+:Відкриває BusOptima Web;
+:Вводить email та пароль;
+:Натискає «Увійти»;
+
+|Клієнтський API (client.ts/http.ts)|
+:POST /api/auth/login\n{email, password};
+
+|Backend REST API|
+:Перевіряє облікові дані;
+
+if (Дані коректні?) then (так)
+  :Повертає {access_token, user};
+  |LocalStorage|
+  :Зберігає token та user;
+  |Користувач|
+  :Отримує доступ до консолі\nвідповідно до своєї ролі;
+
+  if (Роль = Бізнес-адміністратор?) then (так)
+    :Відкриває Налаштування системи;
+    |Клієнтський API (client.ts/http.ts)|
+    :GET /api/admin/settings;
+    |Backend REST API|
+    :Повертає поточні параметри ціноутворення;
+    |Користувач|
+    :Редагує коефіцієнти (пік, вихідні, сезони);
+    :Натискає «Зберегти»;
+    |Клієнтський API (client.ts/http.ts)|
+    :PUT /api/admin/settings\n{нові значення};
+    |Backend REST API|
+    :Валідує та зберігає налаштування;
+    :Записує дію в журнал аудиту;
+    :Повертає 200 OK;
+    |Користувач|
+    :Бачить підтвердження збереження;
+  else (ні)
+  endif
+else (ні)
+  |Backend REST API|
+  :Повертає 401 Unauthorized;
+  |Клієнтський API (client.ts/http.ts)|
+  :Повертає повідомлення про помилку;
+  |Користувач|
+  :Бачить повідомлення про помилку;
+  :Повторює введення даних;
+endif
+
+|Користувач|
+:Натискає «Вийти»;
+|LocalStorage|
+:Видаляє token і профіль користувача;
+|Користувач|
+:Повертається на Login Screen;
+stop
+
+@enduml

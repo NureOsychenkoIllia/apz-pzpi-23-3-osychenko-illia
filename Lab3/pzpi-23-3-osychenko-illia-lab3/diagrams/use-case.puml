@@ -1,0 +1,87 @@
+@startuml use-case
+skinparam monochrome true
+skinparam backgroundColor #FFFFFF
+skinparam ActorBorderColor #1A3A6B
+skinparam ActorFontColor #1A3A6B
+skinparam UsecaseBorderColor #1A3A6B
+skinparam UsecaseBackgroundColor #EBF0FA
+skinparam UsecaseFontSize 12
+skinparam ArrowColor #1A3A6B
+skinparam packageBorderColor #1A3A6B
+skinparam packageBackgroundColor #F5F8FF
+skinparam titleFontSize 16
+skinparam titleFontStyle bold
+
+title Діаграма прецедентів — BusOptima Web
+
+left to right direction
+
+actor "Диспетчер" as D
+actor "Бізнес-адміністратор" as BA
+actor "Технічний адміністратор" as TA
+actor "Користувач" as U
+
+D -|> U
+BA -|> U
+TA -|> U
+
+rectangle "BusOptima Web" {
+
+  package "Загальне" {
+    usecase "Автентифікація" as UC_Login
+    usecase "Перемикання мови (UA/EN)" as UC_Lang
+    usecase "Налаштування вигляду інтерфейсу" as UC_Tweaks
+    usecase "Вихід" as UC_Logout
+  }
+
+  package "Диспетчер" {
+    usecase "Моніторинг рейсів у реальному часі" as UC_Monitor
+    usecase "Перегляд деталей рейсу" as UC_TripDetail
+    usecase "Перемикання режиму карта/картки" as UC_LiveLayout
+    usecase "Перегляд прогнозу попиту" as UC_Forecast
+    usecase "Аналіз рентабельності маршрутів" as UC_Profit
+    usecase "Формування та експорт звіту" as UC_Report
+    usecase "Експорт активних рейсів у XLSX" as UC_LiveExport
+  }
+
+  package "Бізнес-адміністратор" {
+    usecase "Керування маршрутами (CRUD)" as UC_Routes
+    usecase "Керування автопарком та IoT" as UC_Fleet
+    usecase "Керування користувачами та ролями" as UC_Users
+    usecase "Налаштування ціноутворення" as UC_Settings
+  }
+
+  package "Технічний адміністратор" {
+    usecase "Експорт резервної копії в XLSX" as UC_Backups
+    usecase "Перегляд журналів сервера" as UC_Logs
+    usecase "Моніторинг стану системи" as UC_Health
+    usecase "Перегляд журналу аудиту" as UC_Audit
+    usecase "Фільтрація аудиту за дією" as UC_AuditFilter
+  }
+}
+
+U --> UC_Login
+U --> UC_Lang
+U --> UC_Tweaks
+U --> UC_Logout
+
+D --> UC_Monitor
+D --> UC_Forecast
+D --> UC_Profit
+D --> UC_Report
+UC_Monitor ..> UC_TripDetail : <<include>>
+UC_Monitor ..> UC_LiveLayout : <<extend>>
+UC_Monitor ..> UC_LiveExport : <<extend>>
+
+BA --> UC_Routes
+BA --> UC_Fleet
+BA --> UC_Users
+BA --> UC_Settings
+
+TA --> UC_Backups
+TA --> UC_Logs
+TA --> UC_Health
+TA --> UC_Audit
+UC_Audit ..> UC_AuditFilter : <<include>>
+
+@enduml

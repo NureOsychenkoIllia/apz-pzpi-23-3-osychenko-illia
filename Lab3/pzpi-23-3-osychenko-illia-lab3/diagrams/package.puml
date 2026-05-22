@@ -1,0 +1,167 @@
+@startuml package
+skinparam monochrome true
+skinparam backgroundColor #FFFFFF
+skinparam packageBorderColor #1A3A6B
+skinparam packageBackgroundColor #EBF0FA
+skinparam ArrowColor #1A3A6B
+skinparam titleFontSize 16
+skinparam titleFontStyle bold
+
+title Діаграма пакетів — BusOptima Web
+
+package "BusOptima Web" {
+
+  package "app/" {
+
+    package "main.tsx" as MainPkg {
+      class "main.tsx" <<entrypoint>> {
+        +render()
+        +QueryClientProvider
+      }
+    }
+
+    package "app/App.tsx" as App {
+      class "App" <<component>> {
+        +page: AppPageId
+        +authUser: SessionUser|null
+        --
+        +renderPage()
+      }
+      class "LoginScreen" <<component>> {
+        +email: string
+        +password: string
+        --
+        +submit()
+      }
+    }
+
+    package "api/" as Api {
+      class "apiClient" <<service>> {
+        +login()
+        +getTrips()
+        +getDashboard()
+        +getForecast()
+        +getProfitability()
+        +getRoutes()
+        +getBuses()
+        +getUsers()
+        +getSettings()
+        +getAuditLogs()
+        +getHealth()
+      }
+      class "http" <<service>> {
+        +http(path, options)
+        +ApiError
+      }
+    }
+
+    package "features/dispatcher" as DispScreens {
+      class "DispatcherLive" <<screen>>
+      class "DispatcherForecast" <<screen>>
+      class "DispatcherProfit" <<screen>>
+      class "DispatcherReports" <<screen>>
+    }
+
+    package "features/admin" as AdminScreens {
+      class "AdminRoutes" <<screen>>
+      class "AdminFleet" <<screen>>
+      class "AdminUsers" <<screen>>
+    }
+
+    package "features/settings" as SettingsPkg {
+      class "AdminSettings" <<screen>>
+    }
+
+    package "features/audit" as AuditPkg {
+      class "TechAudit" <<screen>>
+    }
+
+    package "features/tech" as TechScreens {
+      class "TechBackups" <<screen>>
+      class "TechLogs" <<screen>>
+      class "TechHealth" <<screen>>
+    }
+
+    package "components/" as Shared {
+      class "Icon" <<component>>
+      class "Modal" <<component>>
+      class "LoadBar" <<component>>
+      class "Pill" <<component>>
+      class "Kpi" <<component>>
+      class "LiveMap" <<component>>
+    }
+
+    package "hooks/" as HooksPkg {
+      class "useTweakState" <<hook>>
+    }
+
+    package "config/" as ConfigPkg {
+      class "appConfig" <<config>> {
+        +API_BASE_URL
+        +navByRole
+        +defaultPageByRole
+      }
+    }
+
+    package "types/" as TypesPkg {
+      class "domain.ts" <<types>> {
+        +RoleId
+        +AppPageId
+        +SessionUser
+        +TripViewModel
+        +SettingsDto
+      }
+    }
+
+    package "lib/" as LibPkg {
+      class "mappers.ts" <<mapper>>
+      class "format.ts" <<util>>
+      class "storage.ts" <<storage>>
+      class "queryClient.ts" <<infra>>
+    }
+
+    package "fixtures/" as FixturesPkg {
+      class "appData.ts" <<fixtures>> {
+        +i18n
+        +alerts
+        +fixtureTrips
+        +fixtureRoutes
+        +backupHistory
+      }
+    }
+  }
+
+  package "styles/" as Styles {
+    note "globals.css:\nDesign tokens,\ntypography,\ncomponent styles" as N1
+  }
+}
+
+MainPkg ..> App : запускає
+App ..> DispScreens : renders
+App ..> AdminScreens : renders
+App ..> SettingsPkg : renders
+App ..> AuditPkg : renders
+App ..> TechScreens : renders
+App ..> HooksPkg : використовує
+App ..> ConfigPkg : використовує
+App ..> Api : використовує
+
+DispScreens ..> Shared : використовує
+DispScreens ..> Api : запити
+DispScreens ..> FixturesPkg : fallback
+DispScreens ..> LibPkg : нормалізація
+AdminScreens ..> Shared : використовує
+AdminScreens ..> Api : запити
+AdminScreens ..> FixturesPkg : словники
+SettingsPkg ..> Api : запити
+SettingsPkg ..> Shared : використовує
+AuditPkg ..> Api : запити
+AuditPkg ..> Shared : використовує
+TechScreens ..> Shared : використовує
+TechScreens ..> Api : запити
+TechScreens ..> FixturesPkg : fallback
+HooksPkg ..> LibPkg : localStorage
+Api ..> LibPkg : storage
+Api ..> ConfigPkg : base URL
+
+@enduml

@@ -1,0 +1,72 @@
+@startuml component
+skinparam monochrome true
+skinparam backgroundColor #FFFFFF
+skinparam ComponentBorderColor #1A3A6B
+skinparam ComponentBackgroundColor #EBF0FA
+skinparam ArrowColor #1A3A6B
+skinparam packageBorderColor #1A3A6B
+skinparam packageBackgroundColor #F5F8FF
+skinparam DatabaseBorderColor #1A3A6B
+skinparam DatabaseBackgroundColor #F0F4FF
+skinparam titleFontSize 16
+skinparam titleFontStyle bold
+skinparam componentStyle uml2
+skinparam padding 6
+
+top to bottom direction
+
+title Діаграма компонентів — BusOptima Web
+
+package "Browser / SPA" {
+  [main.tsx\nReactDOM + QueryClientProvider] as Main
+  [App Shell\nApp.tsx + LoginScreen] as AppShell
+  [Tweak State Hook\nuseTweakState] as TweakHook
+  [Feature Screens\nDispatcher / Admin / Tech / Audit / Settings] as Screens
+  [Shared Components\nui.tsx + Modal + LiveMap] as SharedUI
+  [React Query Layer] as QueryLayer
+  [API Client\nclient.ts] as ApiClient
+  [HTTP Transport\nhttp.ts] as HttpLayer
+  [Fixtures + Translators\nappData.ts] as Fixtures
+  [Domain Mappers / Formatters\nmappers.ts + format.ts] as Lib
+  [Session + Tweak Storage\nstorage.ts] as Storage
+}
+
+package "BusOptima Backend API" {
+  [Auth API\n/auth/login] as AuthApi
+  [Trips / Routes / Buses API] as OpsApi
+  [Analytics / Pricing API] as AnalyticsApi
+  [Admin / Audit API] as AdminApi
+  [Health API\n/health] as HealthApi
+}
+
+database "LocalStorage" as LocalStorage
+
+Main --> AppShell
+Main --> QueryLayer
+
+AppShell --> TweakHook
+AppShell --> Screens
+AppShell --> SharedUI
+AppShell --> ApiClient
+
+Screens --> QueryLayer
+Screens --> SharedUI
+Screens --> ApiClient
+Screens --> Fixtures
+Screens --> Lib
+
+ApiClient --> HttpLayer
+ApiClient --> Storage
+HttpLayer --> Storage
+TweakHook --> Storage
+Storage --> LocalStorage
+
+HttpLayer --> AuthApi : POST login
+HttpLayer --> OpsApi : CRUD + list
+HttpLayer --> AnalyticsApi : dashboard,\nforecast,\nprofitability,\npricing
+HttpLayer --> AdminApi : users,\nsettings,\naudit
+ApiClient --> HealthApi : direct fetch
+
+Fixtures -[hidden]down-> LocalStorage
+
+@enduml

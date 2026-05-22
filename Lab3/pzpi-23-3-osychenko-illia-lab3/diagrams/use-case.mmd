@@ -1,0 +1,43 @@
+graph TD
+    U([Користувач])
+    D([Диспетчер])
+    BA([Бізнес-адміністратор])
+    TA([Технічний адміністратор])
+
+    D -->|extends| U
+    BA -->|extends| U
+    TA -->|extends| U
+
+    U --> Login[Авторизація]
+    U --> Logout[Вихід з системи]
+    U --> SwitchLang[Перемикання мови]
+    U --> SetUi[Налаштування вигляду інтерфейсу]
+
+    D --> Monitor[Моніторинг рейсів]
+    D --> ViewForecast[Перегляд прогнозу попиту]
+    D --> ViewProfitability[Перегляд рентабельності]
+    D --> GenerateReport[Формування звіту]
+    D --> ExportLive[Експорт активних рейсів]
+
+    Monitor --> SelectTrip[Вибір рейсу]
+    Monitor --> SwitchLayout[Перемикання карта/картки]
+    SelectTrip --> ViewTripDetail[Перегляд деталей рейсу]
+
+    BA --> ManageRoutes[Керування маршрутами]
+    BA --> ManageFleet[Керування автопарком]
+    BA --> ManageUsers[Керування користувачами]
+    BA --> ManageSettings[Налаштування системи]
+
+    ManageRoutes --> CreateRoute[Створити маршрут]
+    ManageRoutes --> EditRoute[Редагувати маршрут]
+    ManageRoutes --> DeleteRoute[Видалити маршрут]
+
+    ManageUsers --> CreateUser[Створити користувача]
+    ManageUsers --> AssignRole[Призначити роль]
+
+    TA --> ManageBackups[Експорт резервної копії]
+    TA --> ViewLogs[Перегляд журналів]
+    TA --> ViewHealth[Моніторинг стану системи]
+    TA --> ViewAudit[Перегляд журналу аудиту]
+
+    ViewAudit --> FilterAudit[Фільтрація за дією]
