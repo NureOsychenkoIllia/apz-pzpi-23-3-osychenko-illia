@@ -1,0 +1,26 @@
+graph TD
+    Client["Клієнт\n(браузер / мобільний застосунок)"]
+
+    subgraph Docker["Docker Compose (docker-compose.scale.yml)"]
+        Nginx["nginx:alpine\nПорт 80\nRound-robin upstream"]
+
+        subgraph API["API-репліки"]
+            api1["api1\nGo + Fiber v2\nПорт 8080"]
+            api2["api2\nGo + Fiber v2\nПорт 8080"]
+            api3["api3\nGo + Fiber v2\nПорт 8080"]
+        end
+
+        PG["postgres:17-alpine\nПорт 5432\nvolume: postgres_data"]
+        BV[("Volume\nbackup_data\n/app/backups")]
+    end
+
+    Client -->|"HTTP :80"| Nginx
+    Nginx -->|"round-robin"| api1
+    Nginx -->|"round-robin"| api2
+    Nginx -->|"round-robin"| api3
+    api1 -->|"SQL"| PG
+    api2 -->|"SQL"| PG
+    api3 -->|"SQL"| PG
+    api1 --- BV
+    api2 --- BV
+    api3 --- BV

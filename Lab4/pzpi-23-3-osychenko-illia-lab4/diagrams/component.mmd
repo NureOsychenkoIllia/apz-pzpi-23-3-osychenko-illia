@@ -1,0 +1,40 @@
+graph LR
+    subgraph Client["Клієнт"]
+        Web["Web SPA"]
+        Mobile["Android App"]
+    end
+
+    subgraph Infra["Інфраструктура Docker"]
+        Nginx["Nginx\nload balancer"]
+
+        subgraph Backend["BusOptima API (× 3)"]
+            Auth["AuthHandler"]
+            Routes["RouteHandler"]
+            Trips["TripHandler"]
+            IoT["IoTHandler"]
+            Analytics["AnalyticsHandler"]
+            Admin["AdminHandler"]
+            Backup["BackupHandler\n(POST /admin/backup\nGET /admin/backups\nPOST /admin/backups/:id/restore)"]
+        end
+
+        DB[("PostgreSQL")]
+        BackupVol[("Backup Volume\nSQL-дампи")]
+    end
+
+    Web --> Nginx
+    Mobile --> Nginx
+    Nginx --> Auth
+    Nginx --> Routes
+    Nginx --> Trips
+    Nginx --> IoT
+    Nginx --> Analytics
+    Nginx --> Admin
+    Nginx --> Backup
+    Auth --> DB
+    Routes --> DB
+    Trips --> DB
+    IoT --> DB
+    Analytics --> DB
+    Admin --> DB
+    Backup -->|"pg_dump / psql"| DB
+    Backup --- BackupVol

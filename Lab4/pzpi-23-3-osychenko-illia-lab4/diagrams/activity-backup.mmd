@@ -1,0 +1,36 @@
+flowchart TD
+    Start(["Початок"])
+    Auth["Технічний адміністратор\nавтентифікується"]
+    BackupReq["POST /api/admin/backup"]
+    PgDump["BackupService.CreateBackup\npg_dump → /app/backups/backup_YYYYMMDD.sql"]
+    SaveOk{"Успішно?"}
+    BackupOK["Повернути BackupInfo\n(id, filename, size, created_at)"]
+    BackupErr["Повернути HTTP 500"]
+    ListReq["GET /api/admin/backups"]
+    ShowList["Список SQL-файлів\nз /app/backups"]
+    RestoreReq["POST /api/admin/backups/:id/restore"]
+    CheckFile{"Файл існує?"}
+    PsqlRun["BackupService.RestoreBackup\npsql < backup_id.sql"]
+    RestoreOK["HTTP 200 — відновлено"]
+    RestoreNotFound["HTTP 404 — не знайдено"]
+    RestoreErr["HTTP 500 — помилка"]
+    End(["Кінець"])
+
+    Start --> Auth
+    Auth --> BackupReq
+    BackupReq --> PgDump
+    PgDump --> SaveOk
+    SaveOk -->|"так"| BackupOK
+    SaveOk -->|"ні"| BackupErr
+    BackupOK --> ListReq
+    BackupErr --> End
+    ListReq --> ShowList
+    ShowList --> RestoreReq
+    RestoreReq --> CheckFile
+    CheckFile -->|"так"| PsqlRun
+    CheckFile -->|"ні"| RestoreNotFound
+    PsqlRun --> RestoreOK
+    PsqlRun -->|"помилка"| RestoreErr
+    RestoreOK --> End
+    RestoreNotFound --> End
+    RestoreErr --> End

@@ -1,0 +1,32 @@
+graph LR
+    Dispatcher["Диспетчер"]
+    BizAdmin["Бізнес-адміністратор"]
+    TechAdmin["Технічний адміністратор\n(system:backup)"]
+    Driver["Водій"]
+
+    subgraph System["BusOptima — масштабована конфігурація"]
+        UC1["Переглядати рейси та аналітику"]
+        UC2["Керувати маршрутами та автопарком"]
+        UC3["Налаштовувати ціноутворення"]
+        UC4["Переглядати журнал аудиту"]
+        UC5["Управляти користувачами"]
+        UC6["Експортувати налаштування системи\nGET /api/admin/settings/export"]
+        UC7["Імпортувати налаштування системи\nPOST /api/admin/settings/import"]
+        UC8["Створити резервну копію БД\nPOST /api/admin/backup"]
+        UC9["Переглянути список резервних копій\nGET /api/admin/backups"]
+        UC10["Відновити БД з резервної копії\nPOST /api/admin/backups/:id/restore"]
+        UC11["Вибрати рейс і коригувати пасажирів"]
+    end
+
+    Dispatcher --> UC1
+    Dispatcher --> UC4
+    BizAdmin --> UC2
+    BizAdmin --> UC3
+    BizAdmin --> UC5
+    TechAdmin --> UC4
+    TechAdmin --> UC6
+    TechAdmin --> UC7
+    TechAdmin --> UC8
+    TechAdmin --> UC9
+    TechAdmin --> UC10
+    Driver --> UC11
