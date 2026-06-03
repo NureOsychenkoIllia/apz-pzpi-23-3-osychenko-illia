@@ -1,0 +1,6 @@
+# Repository-level generated artifacts
+**/node_modules/
+**/dist/
+**/.vite/
+**/.playwright-mcp/
+transcripts/
