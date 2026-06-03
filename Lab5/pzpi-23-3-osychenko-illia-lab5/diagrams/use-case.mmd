@@ -1,0 +1,32 @@
+graph TD
+  D["Диспетчер"]
+  B["Бізнес-адміністратор"]
+  T["Технічний адміністратор\n(system:backup)"]
+  W["Водій"]
+
+  subgraph sys["BusOptima"]
+    UC1["Переглядати рейси\nта аналітику"]
+    UC4["Журнал аудиту"]
+    UC2["Маршрути та автопарк"]
+    UC3["Ціноутворення"]
+    UC5["Управляти\nкористувачами"]
+    UC6["Експорт налаштувань\nGET /api/admin/settings/export"]
+    UC7["Імпорт налаштувань\nPOST /api/admin/settings/import"]
+    UC8["Резервна копія БД\nPOST /api/admin/backup"]
+    UC9["Список копій\nGET /api/admin/backups"]
+    UC10["Відновити БД\nPOST /api/admin/backups/:id/restore"]
+    UC11["Рейс і пасажири"]
+  end
+
+  D --> UC1
+  D --> UC4
+  B --> UC2
+  B --> UC3
+  B --> UC5
+  T --> UC4
+  T --> UC6
+  T --> UC7
+  T --> UC8
+  T --> UC9
+  T --> UC10
+  W --> UC11

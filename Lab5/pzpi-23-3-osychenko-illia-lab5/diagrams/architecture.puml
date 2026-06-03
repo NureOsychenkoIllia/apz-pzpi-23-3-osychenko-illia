@@ -1,0 +1,59 @@
+@startuml
+skinparam monochrome true
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam node {
+  BorderColor #1a3a5c
+  BackgroundColor #f5f8fc
+}
+skinparam component {
+  BorderColor #2c5f8a
+  BackgroundColor #ffffff
+}
+skinparam database {
+  BorderColor #1a3a5c
+  BackgroundColor #e8f0fa
+}
+skinparam storage {
+  BorderColor #2c5f8a
+}
+skinparam arrow {
+  Color #444444
+}
+skinparam linetype ortho
+
+node "IoT-клієнт\n(ATRK, ESP32)" as IoT {
+  component "Датчики пасажирів\n+ HTTP-клієнт" as iot_hw
+}
+
+node "Android-клієнт\n(Kotlin / Jetpack Compose)" as Android {
+  component "BusOptima\nAndroid" as android_app
+}
+
+node "Веб-браузер" as WebBrowser {
+  component "BusOptima\nOperations Console\n(React / TypeScript)" as web_app
+}
+
+node "Серверна частина" as ServerNode {
+  component "Nginx\n(балансувальник, порт 80)" as nginx
+  component "API Репліка 1\n(Go / Fiber)" as api1
+  component "API Репліка 2\n(Go / Fiber)" as api2
+  component "API Репліка 3\n(Go / Fiber)" as api3
+  database "PostgreSQL 17" as db
+  storage "backup_data\n(Docker volume)" as bkp
+  nginx --> api1
+  nginx --> api2
+  nginx --> api3
+  api1 --> db
+  api2 --> db
+  api3 --> db
+  api1 --> bkp
+  api2 --> bkp
+  api3 --> bkp
+}
+
+IoT -right-> nginx : REST / HTTP
+Android -right-> nginx : REST / HTTP
+WebBrowser -right-> nginx : REST / HTTP
+
+@enduml

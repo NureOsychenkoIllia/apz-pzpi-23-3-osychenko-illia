@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome true
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam usecase {
+  BorderColor #2c5f8a
+  BackgroundColor #f0f5fb
+  ArrowColor #444444
+}
+skinparam actor {
+  BorderColor #1a3a5c
+  BackgroundColor #e8f0fa
+}
+skinparam rectangle {
+  BorderColor #1a3a5c
+  BackgroundColor #fafcff
+  FontStyle bold
+  FontSize 14
+}
+skinparam nodesep 30
+skinparam ranksep 40
+
+actor "Диспетчер" as D
+actor "Бізнес-\nадміністратор" as B
+actor "Технічний\nадміністратор\n(system:backup)" as T
+actor "Водій" as W
+
+rectangle "BusOptima" {
+  usecase "Рейси та аналітика\nПрогноз попиту\nРентабельність\nЖурнал аудиту" as UC_D
+  usecase "Маршрути та автопарк\nКористувачі\nЦіноутворення" as UC_B
+  usecase "Резервне копіювання БД\n(AES-256-GCM)\nМіграція налаштувань\nТехнічний моніторинг" as UC_T
+  usecase "Перегляд рейсу\nКоригування пасажирів\nРекомендована ціна" as UC_W
+}
+
+D --> UC_D
+B --> UC_B
+T --> UC_T
+W --> UC_W
+@enduml
