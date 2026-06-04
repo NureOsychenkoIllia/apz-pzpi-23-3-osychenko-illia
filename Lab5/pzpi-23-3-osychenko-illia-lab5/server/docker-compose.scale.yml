@@ -1,0 +1,112 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: busoptima_db
+    environment:
+      POSTGRES_DB: busoptima
+      POSTGRES_USER: busoptima_user
+      POSTGRES_PASSWORD: busoptima_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - busoptima_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U busoptima_user -d busoptima"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api1:
+    build: .
+    environment:
+      DATABASE_URL: postgres://busoptima_user:busoptima_pass@postgres:5432/busoptima?sslmode=disable
+      JWT_SECRET: super-secret-jwt-key
+      PORT: 8080
+      BACKUP_STRATEGY: pgdump
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2}
+    volumes:
+      - backup_data:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - busoptima_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  api2:
+    build: .
+    environment:
+      DATABASE_URL: postgres://busoptima_user:busoptima_pass@postgres:5432/busoptima?sslmode=disable
+      JWT_SECRET: super-secret-jwt-key
+      PORT: 8080
+      BACKUP_STRATEGY: pgdump
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2}
+    volumes:
+      - backup_data:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - busoptima_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  api3:
+    build: .
+    environment:
+      DATABASE_URL: postgres://busoptima_user:busoptima_pass@postgres:5432/busoptima?sslmode=disable
+      JWT_SECRET: super-secret-jwt-key
+      PORT: 8080
+      BACKUP_STRATEGY: pgdump
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2}
+    volumes:
+      - backup_data:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - busoptima_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  nginx:
+    image: nginx:alpine
+    container_name: busoptima_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api1
+      - api2
+      - api3
+    networks:
+      - busoptima_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  backup_data:
+
+networks:
+  busoptima_network:
+    driver: bridge

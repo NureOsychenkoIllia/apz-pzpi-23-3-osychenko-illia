@@ -1,0 +1,4 @@
+# Local Go build outputs
+api
+main
+bin/
